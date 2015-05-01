@@ -10,17 +10,21 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONArray;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +42,10 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        listView = (ListView) findViewById(R.id.listView);
+
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,this);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,0,this);
 
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "ibEJg13ONSbk3wKIW9VfS2sefpCBP4DuAUeiZhyg", "KlWccS4kub3utRSvmRZlRAzyREmgygPTCwhZDAd2");
@@ -66,6 +72,20 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void DataFromParse(View view){
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(this);
+        }
+        new GetData().execute();
+    }
+
+    public void DataToParse(View view){
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(this);
+        }
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,0,this);
     }
 
     @Override
@@ -96,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         boolean isNetworkAvaible = false;
         if (networkInfo != null && networkInfo.isConnected()) {
             isNetworkAvaible = true;
-            Toast.makeText(this, "Network is available ", Toast.LENGTH_LONG)
+            Toast.makeText(this, "Sending data", Toast.LENGTH_LONG)
                     .show();
         } else {
             Toast.makeText(this, "Network not available ", Toast.LENGTH_LONG)
@@ -125,7 +145,6 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
             ParseObject testObject = new ParseObject("Route");
             testObject.put("Latitude",mLocation.getLatitude());
             testObject.put("Longitude",mLocation.getLongitude());
-            testObject.put("Altitude",mLocation.getAltitude());
             testObject.saveInBackground();
             return null;
         }
@@ -136,5 +155,51 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
             // Dismiss the progress dialog
         }
 
+    }
+
+    private class GetData extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Create a progressdialog
+            pDialog = new ProgressDialog(MainActivity.this);
+            // Set progressdialog title
+            pDialog.setTitle("Loading data from Parse");
+            // Set progressdialog message
+            pDialog.setMessage("Loading...");
+            pDialog.setIndeterminate(false);
+            // Show progressdialog
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Create the array
+            values = new ArrayList<String>();
+            try {
+                ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Route");
+                ob = query.find();
+                for (ParseObject data : ob)
+                    values.add("\nLatitude: "+ data.get("Latitude")+ "\nLongitude: " + data.get("Longitude") + "\n");
+
+            } catch (com.parse.ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // Locate the listview in listview_main.xml
+            // Pass the results into ListViewAdapter.java
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, values);
+
+            listView.setAdapter(adapter);
+
+            // Close the progressdialog
+            pDialog.dismiss();
+        }
     }
 }
