@@ -144,7 +144,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
             // Creating service handler class instance
             ParseObject testObject = new ParseObject("Route");
             testObject.put("Latitude",mLocation.getLatitude());
+            Log.d("Latitude: ", mLocation.getLatitude()+"");
             testObject.put("Longitude",mLocation.getLongitude());
+            Log.d("Longitude: ", mLocation.getLongitude()+"\n");
             testObject.saveInBackground();
             return null;
         }

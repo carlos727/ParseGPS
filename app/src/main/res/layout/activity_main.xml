@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/gray_ligth">
 
     <TextView
         android:text="GPS"
@@ -12,20 +13,49 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:textSize="44dp"/>
+        android:textSize="44dp"
+        android:background="@color/blue_ligth"
+        android:textColor="@color/white"
+        android:layout_margin="1dp"/>
 
     <ListView
+        android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="4">
+        android:layout_weight="5">
 
     </ListView>
 
-    <Button
-        android:text="Parse"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:textSize="24dp"/>
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/button"
+            android:text="Get Data"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textSize="24dp"
+            android:onClick="DataFromParse"
+            android:background="@color/blue_ligth"
+            android:textColor="@color/white"
+            android:layout_margin="1dp"/>
+
+        <Button
+            android:id="@+id/button2"
+            android:text="Send Data"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textSize="24dp"
+            android:onClick="DataToParse"
+            android:background="@color/blue_ligth"
+            android:textColor="@color/white"
+            android:layout_margin="1dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>
